@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Ubuntu Collection - Store</title>
+    <style>
+        /* Pure Black & White Theme with Subtle Tint */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #F8F9FA; /* Very subtle, elegant off-white/grey tint */
+            color: #111827;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Full Width Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #FFFFFF; /* White background */
+            color: #000000;
+            padding: 20px 40px;
+            border-bottom: 1px solid #E5E7EB; /* Subtle grey line */
+            width: 100%;
+            box-sizing: border-box; /* Ensures padding doesn't break the width */
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar h1 { margin: 0; font-size: 22px; letter-spacing: 2px; font-weight: 700; text-transform: uppercase;}
+        .nav-links { display: flex; align-items: center; gap: 20px; }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.2s;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-primary {
+            background-color: #000000;
+            color: #FFFFFF;
+        }
+        .btn-primary:hover { background-color: #333333; }
+
+        .btn-outline {
+            background-color: transparent;
+            color: #000000;
+            border: 2px solid #000000;
+        }
+        .btn-outline:hover { background-color: #000000; color: #FFFFFF; }
+
+        .btn-cart {
+            background-color: #F3F4F6; /* Light grey */
+            color: #000000;
+        }
+        .btn-cart:hover { background-color: #E5E7EB; }
+
+        /* Main Content Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .product-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        .product-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .product-info { padding: 20px; }
+        .product-info h3 { margin: 0 0 10px 0; font-size: 18px; font-weight: 600; }
+        .product-info p { margin: 0 0 20px 0; color: #6B7280; font-size: 14px; line-height: 1.5; }
+        .price { font-size: 20px; font-weight: 700; color: #000000; margin-bottom: 20px;}
+    </style>
+</head>
+<body>
+
+<!-- Full Width Navbar -->
+<div class="navbar">
+    <h1>Ubuntu Collection</h1>
+    <div class="nav-links">
+        <a th:href="@{/cart}" class="btn btn-cart">View Cart</a>
+        <form th:action="@{/logout}" method="post" style="margin: 0;">
+            <button type="submit" class="btn btn-outline">Logout</button>
+        </form>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+    <h2 style="font-weight: 400; margin-bottom: 30px;">Latest Products</h2>
+
+    <div class="product-grid">
+        <div class="product-card" th:each="product : ${products}">
+            <img th:src="@{'/images/' + ${product.imageNames[0]}}" alt="Product Image">                <h3 th:text="${product.name}">Product Name</h3>
+                <p th:text="${product.description}">Description</p>
+                <div class="price">Ksh <span th:text="${product.price}">0.00</span></div>
+                <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Add to Cart</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <p th:if="${#lists.isEmpty(products)}" style="text-align: center; color: #6B7280; margin-top: 50px;">No products added yet.</p>
+</div>
+
+</body>
+</html>

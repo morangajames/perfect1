@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Your Cart - Ubuntu Collection</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #FFFFFF;
+            color: #000000;
+            margin: 0;
+            padding: 0;
+        }
+        .container { max-width: 900px; margin: 40px auto; padding: 20px; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000000; padding-bottom: 15px; margin-bottom: 30px;}
+        h1 { margin: 0; font-weight: 400; font-size: 28px; }
+
+        table { width: 100%; border-collapse: collapse; background: #FFFFFF; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #E5E7EB; }
+        th { background-color: #F9FAFB; color: #000000; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;}
+
+        .btn {
+            padding: 10px 20px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+        .btn-remove { background-color: #FFFFFF; color: #000000; border: 1px solid #000000; padding: 5px 10px; font-size: 12px; }
+        .btn-remove:hover { background-color: #000000; color: #FFFFFF; }
+
+        .total-row { margin-top: 30px; text-align: right; font-size: 24px; font-weight: 700; border-top: 2px solid #000000; padding-top: 20px;}
+
+        .actions { margin-top: 40px; display: flex; justify-content: space-between; align-items: center; }
+
+        .btn-continue { background-color: #FFFFFF; color: #000000; border: 2px solid #000000; }
+        .btn-continue:hover { background-color: #F9FAFB; }
+
+        .btn-checkout { background-color: #000000; color: #FFFFFF; padding: 15px 30px; font-size: 16px; border: 2px solid #000000;}
+        .btn-checkout:hover { background-color: #333333; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Your Cart</h1>
+        <a th:href="@{/}" style="color: #6B7280; text-decoration: none; font-size: 14px;">Continue Shopping</a>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Qty</th>
+            <th>Subtotal</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${cartItems}">
+            <td style="display: flex; align-items: center; gap: 15px;">
+                <img th:src="@{'/images/' + ${item.product.imageNames[0]}}" width="70" height="70" style="object-fit: cover; border: 1px solid #E5E7EB;">                <span th:text="${item.product.name}" style="font-weight: 600;">Product Name</span>
+            </td>
+            <td th:text="'Ksh ' + ${item.product.price}">Price</td>
+            <td th:text="${item.quantity}">1</td>
+            <td th:text="'Ksh ' + ${item.product.price * item.quantity}" style="font-weight: 600;">Subtotal</td>
+            <td>
+                <form th:action="@{/cart/remove/{id}(id=${item.id})}" method="post" style="margin: 0;">
+                    <button type="submit" class="btn btn-remove">Remove</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p th:if="${#lists.isEmpty(cartItems)}" style="text-align: center; color: #6B7280; margin-top: 50px;">Your cart is empty.</p>
+
+    <div class="total-row" th:if="${!cartItems.isEmpty()}">
+        Total: Ksh <span th:text="${total}">0.00</span>
+    </div>
+
+    <div class="actions" th:if="${!cartItems.isEmpty()}">
+        <a th:href="@{/}" class="btn btn-continue">Back to Shop</a>
+        <a th:href="@{/checkout}" class="btn btn-checkout">Checkout</a>
+    </div>
+</div>
+
+</body>
+</html>

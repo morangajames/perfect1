@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Register - Ubuntu Collection</title>
+</head>
+<body>
+<h2>Create an Account</h2>
+
+<!-- Show error if email exists -->
+<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+
+<form th:action="@{/register}" th:object="${user}" method="post">
+
+    <label>Full Name:</label><br>
+    <input type="text" th:field="*{fullName}" required><br><br>
+
+    <label>Email:</label><br>
+    <input type="email" th:field="*{email}" required><br><br>
+
+    <label>Password:</label><br>
+    <input type="password" th:field="*{password}" required><br><br>
+
+    <label>I want to join as:</label><br>
+    <select th:field="*{role}">
+        <option value="BUYER">Buyer (I want to shop)</option>
+        <option value="SELLER">Seller (I want to sell products)</option>
+    </select><br><br>
+
+    <button type="submit">Register</button>
+</form>
+<br>
+<p>Already have an account? <a th:href="@{/login}">Login here</a></p>
+</body>
+</html>
