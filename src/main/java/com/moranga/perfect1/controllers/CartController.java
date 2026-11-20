@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -29,7 +30,9 @@ public class CartController {
 
     // 1. Add a product to the cart
     @PostMapping("/add/{productId}")
-    public String addToCart(@PathVariable Long productId, Authentication authentication) {
+    public String addToCart(@PathVariable Long productId,
+                            Authentication authentication,
+                            RedirectAttributes redirectAttributes) {
         String email = authentication.getName();
         User user = userRepository.findByEmail(email).orElseThrow();
         Product product = productRepository.findById(productId).orElseThrow();
@@ -55,7 +58,11 @@ public class CartController {
             cartItemRepository.save(newItem);
         }
 
+        // Add success message to be shown on the cart page (or index page)
+        redirectAttributes.addFlashAttribute("successMessage", "Item added to cart successfully!");
+
         return "redirect:/cart";
+        // Note: If you want to stay on the home page after adding, change this to "redirect:/"
     }
 
     // 2. Show the cart page

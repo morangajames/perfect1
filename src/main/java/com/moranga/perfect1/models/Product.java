@@ -13,16 +13,25 @@ public class Product {
     private Long id;
 
     private String name;
+
+    @Column(length = 1000)
     private String description;
+
     private double price;
 
-    // NEW: Changed from a single String to a List of Strings
+    private int stock; // NEW: track inventory
+
     @ElementCollection
     @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "image_name")
-    private List<String> imageNames = new ArrayList<>();
+    private List<String> imageNames = new ArrayList<>(); // matches your existing field
 
-    // Getters and Setters
+    // NEW: Link product to the seller who created it
+    @ManyToOne
+    @JoinColumn(name = "seller_id")
+    private User seller;
+
+    // --- Getters and Setters ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -35,6 +44,12 @@ public class Product {
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
 
+    public int getStock() { return stock; }
+    public void setStock(int stock) { this.stock = stock; }
+
     public List<String> getImageNames() { return imageNames; }
     public void setImageNames(List<String> imageNames) { this.imageNames = imageNames; }
+
+    public User getSeller() { return seller; }
+    public void setSeller(User seller) { this.seller = seller; }
 }

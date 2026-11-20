@@ -1,19 +1,16 @@
 package com.moranga.perfect1.controllers;
 
 import com.moranga.perfect1.models.Product;
+import com.moranga.perfect1.models.User;
 import com.moranga.perfect1.repositories.ProductRepository;
+import com.moranga.perfect1.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -23,38 +20,54 @@ public class SellerController {
     @Autowired
     private ProductRepository productRepository;
 
-    // 1. Show the Add Product Form
+    @Autowired
+    private UserRepository userRepository;
+
+    // 1. Show seller dashboard (list of their products)
     @GetMapping("/dashboard")
-    public String sellerDashboard(Model model) {
-        model.addAttribute("product", new Product());
+    public String dashboard(Authentication authentication, Model model) {
+        User seller = userRepository.findByEmail(authentication.getName()).orElseThrow();
+        List<Product> myProducts = productRepository.findBySeller(seller);
+        model.addAttribute("products", myProducts);
         return "seller_dashboard";
     }
 
-    // 2. Handle the form submission (Save product + multiple images)
-    @PostMapping("/add-product")
+    // 2. Show "Add Product" form
+    @GetMapping("/products/add")
+    public String showAddProductForm(Model model) {
+        model.addAttribute("product", new Product());
+        return "add_product";
+    }
+
+    // 3. Handle form submission
+    @PostMapping("/products/add")
     public String addProduct(@ModelAttribute Product product,
-                             @RequestParam("imageFiles") MultipartFile[] imageFiles) throws IOException {
+                             @RequestParam("imageName") String imageName,
+                             Authentication authentication,
+                             RedirectAttributes redirectAttributes) {
+        User seller = userRepository.findByEmail(authentication.getName()).orElseThrow();
+        product.setSeller(seller);
 
-        String uploadDir = "src/main/resources/static/images/";
-        Path uploadPath = Paths.get(uploadDir);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
+        // Add image name (assumes image already exists in /static/images)
+        if (imageName != null && !imageName.isBlank()) {
+            product.getImageNames().add(imageName);
         }
 
-        List<String> savedImageNames = new ArrayList<>();
+        productRepository.save(product);
+        redirectAttributes.addFlashAttribute("success", "Product added successfully!");
+        return "redirect:/seller/dashboard";
+    }
 
-        // Loop through all uploaded images
-        for (MultipartFile file : imageFiles) {
-            if (!file.isEmpty()) {
-                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-                Files.copy(file.getInputStream(), uploadPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
-                savedImageNames.add(fileName);
-            }
+    // 4. Delete a product (optional but useful)
+    @PostMapping("/products/delete/{id}")
+    public String deleteProduct(@PathVariable Long id, Authentication authentication) {
+        Product product = productRepository.findById(id).orElseThrow();
+        User seller = userRepository.findByEmail(authentication.getName()).orElseThrow();
+
+        // Safety: only allow deleting own products
+        if (product.getSeller() != null && product.getSeller().getId().equals(seller.getId())) {
+            productRepository.delete(product);
         }
-
-        product.setImageNames(savedImageNames);
-        productRepository.save(product); // Fixed: properly saved to the database
-
-        return "redirect:/seller/dashboard?success";
+        return "redirect:/seller/dashboard";
     }
 }

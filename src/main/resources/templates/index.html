@@ -3,34 +3,30 @@
 <head>
     <title>Ubuntu Collection - Store</title>
     <style>
-        /* Pure Black & White Theme with Subtle Tint */
+        /* ... your existing CSS stays exactly the same ... */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #F8F9FA; /* Very subtle, elegant off-white/grey tint */
+            background-color: #F8F9FA;
             color: #111827;
             margin: 0;
             padding: 0;
         }
-
-        /* Full Width Navbar */
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #FFFFFF; /* White background */
+            background-color: #FFFFFF;
             color: #000000;
             padding: 20px 40px;
-            border-bottom: 1px solid #E5E7EB; /* Subtle grey line */
+            border-bottom: 1px solid #E5E7EB;
             width: 100%;
-            box-sizing: border-box; /* Ensures padding doesn't break the width */
+            box-sizing: border-box;
             position: sticky;
             top: 0;
             z-index: 100;
         }
         .navbar h1 { margin: 0; font-size: 22px; letter-spacing: 2px; font-weight: 700; text-transform: uppercase;}
         .nav-links { display: flex; align-items: center; gap: 20px; }
-
-        /* Buttons */
         .btn {
             padding: 10px 20px;
             text-decoration: none;
@@ -42,33 +38,13 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        .btn-primary {
-            background-color: #000000;
-            color: #FFFFFF;
-        }
+        .btn-primary { background-color: #000000; color: #FFFFFF; }
         .btn-primary:hover { background-color: #333333; }
-
-        .btn-outline {
-            background-color: transparent;
-            color: #000000;
-            border: 2px solid #000000;
-        }
+        .btn-outline { background-color: transparent; color: #000000; border: 2px solid #000000; }
         .btn-outline:hover { background-color: #000000; color: #FFFFFF; }
-
-        .btn-cart {
-            background-color: #F3F4F6; /* Light grey */
-            color: #000000;
-        }
+        .btn-cart { background-color: #F3F4F6; color: #000000; }
         .btn-cart:hover { background-color: #E5E7EB; }
-
-        /* Main Content Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        /* Product Grid */
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -78,6 +54,8 @@
             background-color: #FFFFFF;
             border: 1px solid #E5E7EB;
             transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column; /* Ensures content aligns correctly */
         }
         .product-card:hover {
             transform: translateY(-5px);
@@ -89,9 +67,9 @@
             object-fit: cover;
             border-bottom: 1px solid #E5E7EB;
         }
-        .product-info { padding: 20px; }
+        .product-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1;}
         .product-info h3 { margin: 0 0 10px 0; font-size: 18px; font-weight: 600; }
-        .product-info p { margin: 0 0 20px 0; color: #6B7280; font-size: 14px; line-height: 1.5; }
+        .product-info p { margin: 0 0 20px 0; color: #6B7280; font-size: 14px; line-height: 1.5; flex-grow: 1;}
         .price { font-size: 20px; font-weight: 700; color: #000000; margin-bottom: 20px;}
     </style>
 </head>
@@ -112,19 +90,43 @@
 <div class="container">
     <h2 style="font-weight: 400; margin-bottom: 30px;">Latest Products</h2>
 
-    <div class="product-grid">
+    <!-- Message if cart add was successful (Optional: pass via redirect attribute) -->
+    <p th:if="${param.added}" style="color: #16A34A; margin-bottom: 20px;">Item added to cart successfully!</p>
+
+    <!-- Product Grid -->
+    <div class="product-grid" th:if="${not #lists.isEmpty(products)}">
         <div class="product-card" th:each="product : ${products}">
-            <img th:src="@{'/images/' + ${product.imageNames[0]}}" alt="Product Image">                <h3 th:text="${product.name}">Product Name</h3>
+
+            <!-- Safe image check: uses a placeholder if the image list is empty -->
+            <img th:if="${not #lists.isEmpty(product.imageNames)}"
+                 th:src="@{'/images/' + ${product.imageNames[0]}}"
+                 alt="Product Image">
+            <img th:if="${#lists.isEmpty(product.imageNames)}"
+                 src="/images/placeholder.png"
+                 alt="No Image Available">
+
+            <!-- Wrap all info in the product-info div -->
+            <div class="product-info">
+                <h3 th:text="${product.name}">Product Name</h3>
                 <p th:text="${product.description}">Description</p>
-                <div class="price">Ksh <span th:text="${product.price}">0.00</span></div>
-                <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post">
+
+                <!-- Formatted Price -->
+                <div class="price">
+                    Ksh <span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">0.00</span>
+                </div>
+
+                <form th:action="@{/cart/add/{id}(id=${product.id})}" method="post" style="margin-top: auto;">
                     <button type="submit" class="btn btn-primary" style="width: 100%;">Add to Cart</button>
                 </form>
             </div>
+
         </div>
     </div>
 
-    <p th:if="${#lists.isEmpty(products)}" style="text-align: center; color: #6B7280; margin-top: 50px;">No products added yet.</p>
+    <!-- Empty State -->
+    <p th:if="${#lists.isEmpty(products)}" style="text-align: center; color: #6B7280; margin-top: 50px; font-size: 16px;">
+        No products added yet. Check back later!
+    </p>
 </div>
 
 </body>

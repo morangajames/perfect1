@@ -1,34 +1,166 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Ubuntu Collection</title>
+    <style>
+        /* Match the Login Page Theme */
+        body {
+            font-family: Arial, sans-serif; /* Clean, standard font */
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* The Box/Card */
+        .register-card {
+            background-color: #ffffff;
+            padding: 40px;
+            border: 1px solid #e0e0e0; /* Very faint grey border like the login page */
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 24px;
+            font-weight: normal;
+            letter-spacing: 1px;
+            margin-top: 0;
+            margin-bottom: 30px;
+            color: #000;
+        }
+
+        /* Alert/Error Box */
+        .alert-box {
+            background-color: #f8f9fa; /* Light grey background */
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 25px;
+            color: #000;
+        }
+
+        .alert-box.error {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        /* Uppercase, bold labels matching the login page */
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #000;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Square inputs with black borders */
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #000; /* Solid black border */
+            border-radius: 0; /* No rounded corners */
+            font-size: 14px;
+            box-sizing: border-box;
+            background-color: #fff;
+            color: #000;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            box-shadow: 0 0 0 1px #000; /* Slight shadow to indicate focus */
+        }
+
+        /* Black button, white text, no rounded corners */
+        .btn-register {
+            width: 100%;
+            padding: 15px;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            border-radius: 0;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-register:hover {
+            background-color: #333; /* Slightly lighter black on hover */
+        }
+
+        /* Footer Link */
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .login-link a {
+            color: #000;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-<h2>Create an Account</h2>
 
-<!-- Show error if email exists -->
-<p th:if="${error}" th:text="${error}" style="color: red;"></p>
+<div class="register-card">
+    <h2>REGISTER</h2>
 
-<form th:action="@{/register}" th:object="${user}" method="post">
+    <!-- Show error if email exists (Styled like the logout message) -->
+    <div th:if="${error}" th:text="${error}" class="alert-box error"></div>
 
-    <label>Full Name:</label><br>
-    <input type="text" th:field="*{fullName}" required><br><br>
+    <form th:action="@{/register}" th:object="${user}" method="post">
 
-    <label>Email:</label><br>
-    <input type="email" th:field="*{email}" required><br><br>
+        <div class="input-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" th:field="*{fullName}" required>
+        </div>
 
-    <label>Password:</label><br>
-    <input type="password" th:field="*{password}" required><br><br>
+        <div class="input-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" th:field="*{email}" required>
+        </div>
 
-    <label>I want to join as:</label><br>
-    <select th:field="*{role}">
-        <option value="BUYER">Buyer (I want to shop)</option>
-        <option value="SELLER">Seller (I want to sell products)</option>
-    </select><br><br>
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" th:field="*{password}" required>
+        </div>
 
-    <button type="submit">Register</button>
-</form>
-<br>
-<p>Already have an account? <a th:href="@{/login}">Login here</a></p>
+        <div class="input-group">
+            <label for="role">Join As</label>
+            <select id="role" th:field="*{role}">
+                <option value="BUYER">Buyer (I want to shop)</option>
+                <option value="SELLER">Seller (I want to sell products)</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn-register">SIGN UP</button>
+    </form>
+
+    <div class="login-link">
+        Already have an account? <a th:href="@{/login}">Log in</a>
+    </div>
+</div>
+
 </body>
 </html>

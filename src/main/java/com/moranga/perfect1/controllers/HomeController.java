@@ -14,7 +14,12 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute("products", productRepository.findAll()); // This is the magic line
+        // Optional: Filter products that are in stock (if you have a 'stock' field)
+        // model.addAttribute("products", productRepository.findByStockGreaterThan(0));
+
+        // Currently returns all products (works fine)
+        model.addAttribute("products", productRepository.findAll());
+
         return "index";
     }
 }
